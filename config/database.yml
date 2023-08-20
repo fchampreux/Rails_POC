@@ -1,0 +1,36 @@
+# PostGre databases
+
+default: &default
+  host: localhost
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  username: <%= Rails.application.credentials.databases[:username] %>
+  password: <%= Rails.application.credentials.databases[:password] %>
+  schema_search_path: <%= "#{ Rails.application.credentials.databases[:schemas] }, public" %>
+  #schema_search_path: "dq_app, public"
+
+development:
+  <<: *default
+  database: influenza_dev
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: influenza_tes
+  # Remember to use distinct password for each environment to avoid connecting to the wrong environment
+
+validation:
+  <<: *default
+  database: influenza_val
+  # Remember to use distinct password for each environment to avoid connecting to the wrong environment
+
+production:
+  <<: *default
+  database: influenza_prod
+  # Remember to use distinct password for each environment to avoid connecting to the wrong environment
+
+ 
+  schema_search_path: "inf_app, inf_admin, public"
