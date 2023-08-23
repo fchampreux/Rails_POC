@@ -1,7 +1,7 @@
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
-  include PgSearch::Model, MetadataSetup
+  include PgSearch::Model
 
   ### before filters
   before_validation :set_code 
@@ -42,7 +42,7 @@ class ApplicationRecord < ActiveRecord::Base
       if code[0] == '_'
         code
       else
-        list_id = ParametersList.where("code=?", 'LIST_OF_OBJECT_TYPES').take!
+        list_id = ParametersList.where("code=?", '_OBJECT_TYPES').take!
         if object_type = Parameter.find_by("parameters_list_id=? AND code=?", list_id, self.class.name )
           prefix = object_type.property
           # Check if this object requires to apply a naming convention

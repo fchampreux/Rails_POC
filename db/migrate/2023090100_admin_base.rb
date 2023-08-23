@@ -46,8 +46,8 @@ class AdminBase < ActiveRecord::Migration[7.0]
       t.string "unlock_token",           limit: 255
       t.datetime "locked_at"
       t.belongs_to :owner,                            null: false, comment: "All managed objects have a owner"
-      t.integer "created_by_id",         limit: 255,  null: false, comment: "Trace of the user or process who created the record"
-      t.integer "updated_by_id",         limit: 255,  null: false, comment: "Trace of the last user or process who updated the record"
+      t.string "created_by",             limit: 255,  null: false, comment: "Trace of the user or process who created the record"
+      t.string "updated_by",             limit: 255,  null: false, comment: "Trace of the last user or process who updated the record"
       t.timestamps null: false
 
       t.index ["email"], name: "index_users_on_email", unique: true
@@ -64,8 +64,8 @@ class AdminBase < ActiveRecord::Migration[7.0]
       t.references :status,                        default: 0,     comment: "Status is used for validation workflow in some objects only"
       t.string "sort_code",              limit: 255,               comment: "Code used for sorting displayed indexes"
       t.belongs_to :owner,                            null: false, comment: "All managed objects have a owner"
-      t.integer "created_by_id",         limit: 255,  null: false, comment: "Trace of the user or process who created the record"
-      t.integer "updated_by_id",         limit: 255,  null: false, comment: "Trace of the last user or process who updated the record"
+      t.string "created_by",             limit: 255,  null: false, comment: "Trace of the user or process who created the record"
+      t.string "updated_by",             limit: 255,  null: false, comment: "Trace of the last user or process who updated the record"
       t.timestamps null: false
 
       t.index ["code"], name: "index_group_on_code", unique: true
@@ -129,11 +129,7 @@ class AdminBase < ActiveRecord::Migration[7.0]
 
       t.index ["code", "parameters_list_id"], name: "index_parameters_on_code", unique: true
       t.index ["sort_code"], name: "index_parameters_on_sort_code"
-    end
-      
-
-
-
+    end 
 
   end
 end

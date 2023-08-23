@@ -7,18 +7,33 @@
 # User management: users, groups, groups_users
 # Authorisations: groups_roles
 
+puts "Seeding users"
+if User.count == 0
+  puts "Creating first users" # No translation for users
+  u = User.new( id: 0, user_name: 'Unassigned', password: ENV["admin_pass"], password_confirmation: ENV["admin_pass"], is_admin: 0, last_name: 'User', first_name: 'Undefined', description: {"en"=>"Undefined user"}, active_from: '2000-01-01', active_to: '2100-01-01', created_by: 'Rake', updated_by: 'Rake', owner_id: 0, email: 'support@opendataquality.com')
+  u.save(validate: false)
+  u = User.new( user_name: 'Admin', password: ENV["admin_pass"], password_confirmation: ENV["admin_pass"], is_admin: 1, last_name: 'Administrator', first_name: 'Open Data Quality', description: {"en"=>"Admin user"}, active_from: '2000-01-01', active_to: '2100-01-01', created_by: 'Rake', updated_by: 'Rake', owner_id: 0, email: 'frederic.champreux@opendataquality.com')
+  u.save(validate: false)
+
+  puts User.all.map { |list| list.user_name }
+  Rails.logger.backend.info 'Created users:'
+  Rails.logger.backend.info User.all.map { |list| list.user_name }    
+  puts '---'
+end
+
+puts "SQL Queries"
+ActiveRecord::Base.connection.execute("update users set confirmed_at = now()")
+
 puts "Seeding parameters lists"
 # Only parameters required for the application to start are created here after. The rest of parameters should be imported throug Excel sheets.
 if ParametersList.count == 0
   puts "Initialising parameters lists"
-  ParametersList.without_callback(:validation, :before, :set_code) do
-    ParametersList.create(id: 0, code: 'LIST_OF_UNDEFINED', name: {"en"=>"List of Undefined"}, description: {"en"=>"This list is assigned an undefined value"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-    ParametersList.create(code: 'LIST_OF_DISPLAY_PARAMETERS', name: {"en"=>"List of display parameters"}, description: {"en"=>"This list contains display settings for users"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-    ParametersList.create(code: 'LIST_OF_LANGUAGES', name: {"en"=>"List of languages"}, description: {"en"=>"This list contains translated localizations"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-    ParametersList.create(code: 'LIST_OF_STATUSES', name: {"en"=>"List of statuses"}, description: {"en"=>"This list contains statuses allowed values"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-    ParametersList.create(code: 'LIST_OF_OBJECT_TYPES', name: {"en"=>"List of object types"}, description: {"en"=>"This list contains objects types"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-    ParametersList.create(code: 'LIST_OF_USER_ROLES', name: {"en"=>"List of user roles"}, description: {"en"=>"This list contains user roles"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
-  end
+  ParametersList.create(id: 0, code: '_UNDEFINED', name: {"en"=>"List of Undefined"}, description: {"en"=>"This list is assigned an undefined value"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
+  ParametersList.create(code: '_DISPLAY_PARAMETERS', name: {"en"=>"List of display parameters"}, description: {"en"=>"This list contains display settings for users"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
+  ParametersList.create(code: '_LANGUAGES', name: {"en"=>"List of languages"}, description: {"en"=>"This list contains translated localizations"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
+  ParametersList.create(code: '_STATUSES', name: {"en"=>"List of statuses"}, description: {"en"=>"This list contains statuses allowed values"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
+  ParametersList.create(code: '_OBJECT_TYPES', name: {"en"=>"List of object types"}, description: {"en"=>"This list contains objects types"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
+  ParametersList.create(code: '_USER_ROLES', name: {"en"=>"List of user roles"}, description: {"en"=>"This list contains user roles"}, created_by: 'Rake', updated_by: 'Rake', owner_id: 1, is_active: true, status_id: 0)
 
   puts ParametersList.all.map { |list| list.code }
   Rails.logger.backend.info 'Created parameters lists:'
@@ -33,20 +48,20 @@ if Parameter.count == 0
   # List of undefined values
   Parameter.create(id: 0, name: {"en"=>"Undefined"}, code: 'UNDEFINED', property: '0', description: {"en"=>"Undefined parameter"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: 0)
   # List of statuses
-  Parameter.create(name: {"en"=>"New"}, code: 'NEW', property: '0', description: {"en"=>"Status is New"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_STATUSES').id )
+  Parameter.create(name: {"en"=>"New"}, code: 'NEW', property: '0', description: {"en"=>"Status is New"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_STATUSES').id )
   # List of display parameters
-  Parameter.create(name: {"en"=>"Nb of lines"}, code: 'LINES', property: '10', description: {"en"=>"Number of lines to display in lists"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_DISPLAY_PARAMETERS').id )
+  Parameter.create(name: {"en"=>"Nb of lines"}, code: 'LINES', property: '10', description: {"en"=>"Number of lines to display in lists"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_DISPLAY_PARAMETERS').id )
   # List of languages
-  Parameter.create(name: {"en"=>"English"}, code: 'en', property: 'en', description: {"en"=>"Translation language"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_LANGUAGES').id )
+  Parameter.create(name: {"en"=>"English"}, code: 'en', property: 'en', description: {"en"=>"Translation language"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_LANGUAGES').id )
   # List of object types - used for importation feature
-  Parameter.create(name: {"en"=>"Parameters List"},    code: 'ParametersList',    property: 'PL', scope: 'import, manage', description: {"en"=>"Lists of parameters"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_OBJECT_TYPES').id )
-  Parameter.create(name: {"en"=>"Parameter"},          code: 'Parameter',         property: 'PARAM', scope: '', description: {"en"=>"Parameter as an item of a parameters list"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_OBJECT_TYPES').id )
-  Parameter.create(name: {"en"=>"User"},               code: 'User',              property: 'USER', scope: 'import, manage', description: {"en"=>"Users of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_OBJECT_TYPES').id )
-  Parameter.create(name: {"en"=>"Group"},              code: 'Group',             property: 'GROUP', scope: 'import, manage', description: {"en"=>"User groups of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_OBJECT_TYPES').id )
+  Parameter.create(name: {"en"=>"Parameters List"},    code: 'ParametersList',    property: 'PL', scope: 'import, manage', description: {"en"=>"Lists of parameters"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_OBJECT_TYPES').id )
+  Parameter.create(name: {"en"=>"Parameter"},          code: 'Parameter',         property: 'PARAM', scope: '', description: {"en"=>"Parameter as an item of a parameters list"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_OBJECT_TYPES').id )
+  Parameter.create(name: {"en"=>"User"},               code: 'User',              property: 'USER', scope: 'import, manage', description: {"en"=>"Users of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_OBJECT_TYPES').id )
+  Parameter.create(name: {"en"=>"Group"},              code: 'Group',             property: 'GROUP', scope: 'import, manage', description: {"en"=>"User groups of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_OBJECT_TYPES').id )
   # List basic roles
-  Parameter.create(name: {"en"=>"Administrator"},        code: 'Admin',           property: 'ADMIN', scope: 'import, manage', description: {"en"=>"Administrators of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_USER_ROLES').id )
-  Parameter.create(name: {"en"=>"Author"},               code: 'Author',          property: 'AUTHOR', scope: 'import, manage', description: {"en"=>"Authors of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_USER_ROLES').id )
-  Parameter.create(name: {"en"=>"Reader"},               code: 'Reader',          property: 'READER', scope: 'import, manage', description: {"en"=>"Readers of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('LIST_OF_USER_ROLES').id )
+  Parameter.create(name: {"en"=>"Administrator"},        code: 'Admin',           property: 'ADMIN', scope: 'import, manage', description: {"en"=>"Administrators of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_USER_ROLES').id )
+  Parameter.create(name: {"en"=>"Author"},               code: 'Author',          property: 'AUTHOR', scope: 'import, manage', description: {"en"=>"Authors of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_USER_ROLES').id )
+  Parameter.create(name: {"en"=>"Reader"},               code: 'Reader',          property: 'READER', scope: 'import, manage', description: {"en"=>"Readers of the application"}, active_from: '2000-01-01', active_to: '2100-01-01',  parameters_list_id: ParametersList.find_by_code('_USER_ROLES').id )
 
   puts Parameter.all.map { |list| "#{list.parent.code}: #{list.code}" }
   Rails.logger.backend.info 'Created parameters:'
@@ -73,20 +88,3 @@ if GroupsUser.count == 0
   ActiveRecord::Base.connection.execute("INSERT INTO #{ Rails.application.credentials.databases[:schemas] }.groups_users(user_id, group_id, is_principal, is_active, active_from, created_at, updated_at) values(1, 0, false, true, current_date, current_date, current_date)")
   ActiveRecord::Base.connection.execute("INSERT INTO #{ Rails.application.credentials.databases[:schemas] }.groups_users(user_id, group_id, is_principal, is_active, active_from, created_at, updated_at) values(1, 1, true, true, current_date, current_date, current_date)")
 end
-
-puts "Seeding users"
-if User.count == 0
-  puts "Creating first users" # No translation for users
-  u = User.new( id: 0, user_name: 'Unassigned', password: ENV["admin_pass"], password_confirmation: ENV["admin_pass"], organisation_id: 0, current_playground_id: 0, is_admin: 0, last_name: 'User', first_name: 'Undefined', description: {"en"=>"Undefined user"}, active_from: '2000-01-01', active_to: '2100-01-01', created_by: 'Rake', updated_by: 'Rake', owner_id: 0, email: 'support@opendataquality.com')
-  u.save(validate: false)
-  u = User.new( user_name: 'Admin', password: ENV["admin_pass"], password_confirmation: ENV["admin_pass"], organisation_id: 0, current_playground_id: 0, is_admin: 1, last_name: 'Administrator', first_name: 'Open Data Quality', description: {"en"=>"Admin user"}, preferred_activities: '{*}', active_from: '2000-01-01', active_to: '2100-01-01', created_by: 'Rake', updated_by: 'Rake', owner_id: 0, email: 'frederic.champreux@opendataquality.com')
-  u.save(validate: false)
-
-  puts User.all.map { |list| list.user_name }
-  Rails.logger.backend.info 'Created users:'
-  Rails.logger.backend.info User.all.map { |list| list.user_name }    
-  puts '---'
-end
-
-puts "SQL Queries"
-ActiveRecord::Base.connection.execute("update users set confirmed_at = now()")
