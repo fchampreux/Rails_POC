@@ -1,0 +1,52 @@
+
+<header class="application-header <%= content_for?(:large_header) ? '' : 'application-header-md' %> offcanvas-main application-header-animate application-header-sticky">
+  <div class="header <%= Rails.env %>">
+    <div class="application-header-title">
+      <div class="application-brand">
+        <a tabindex="-1" href="/">
+          <img alt="Back to home" src="/assets/<%= $Logo %>">
+        </a>
+        <h1 class="application-brand-app-title">
+          <b><%= Rails.env.production? ? "" : "#{Rails.env.capitalize} - " %> </b><%= yield(:page_heading || :title) %>
+        </h1>
+      </div>
+    </div>
+
+    <div class="application-header-controls">
+      <h2 class="sr-only">Contrôles</h2>
+      <ul class="header-controls" role="menu">
+        <% if user_signed_in? %>
+          <li id="language-picker-ct" class="control-item" role="menuitem">
+            <nav id="language-picker">
+              <% parameters_for('languages').each do |language| %>
+                <%= render partial: "shared/language_picker_link", locals: {label: language.code, locale: language.property} %>
+              <% end %>
+            </nav>
+          </li>
+          <li class="control-item" role="menuitem">
+            <%= link_to administration_user_path(current_user), title: t("User") + ": " + current_login, class: "nav-link control-link" do %>
+              <span class="control-icon fa fa-user"></span>
+            <% end %>
+          </li>
+          <li class="control-item" role="menuitem">
+            <%= link_to destroy_user_session_path, method: "delete", title: t("Sign_out"), class: "nav-link control-link" do %>
+              <span class="control-icon fa fa-sign-out-alt"></span>
+            <% end %>
+          </li>
+        <% else %>
+          <li class="control-item" role="menuitem">
+            <%= link_to new_user_session_path, title: t("Sign_in"), class: "nav-link control-link" do %>
+              <span class="control-icon fa fa-sign-in-alt"></span>
+            <% end %>
+          </li>
+        <% end %>
+
+        <li class="control-item" role="menuitem">
+          <%= link_to help_path([namespace, controller_name], action_name), title: t("Help"), class: "nav-link control-link" do %>
+            <span class="control-icon fa fa-info-circle"></span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
