@@ -1,0 +1,14 @@
+<% provide(:title, t('ManagingGroups')) %>
+
+<% provide(:page_heading, t('Groups')) %>
+
+
+<% provide :navigation do %>
+  <%= render partial: "shared/index_view_navigation", locals: {this_object: Group} %>
+<% end %>
+
+<% provide :actions do %>
+  <%= render partial: "shared/object_index_actions", locals: {this_object: Group } %>
+<% end %>
+
+<%= render partial: "groups_index", locals: {this_index: @groups} %>
